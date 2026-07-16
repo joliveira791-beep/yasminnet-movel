@@ -1,0 +1,23 @@
+name: Gerar APK YasminNET
+on: [push, workflow_dispatch]
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Instalar Python e Ferramentas Moveis
+        run: |
+          pip install buildozer cython==0.29.36
+          sudo apt-get install -y scons libportmidi-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav libmtdev-dev xclip xsel libjpeg-dev
+      - name: Criar Configuracao e Compilar App
+        run: |
+          echo "y" | buildozer init
+          sed -i 's/title = My Application/title = YasminNET Movel/g' buildozer.spec
+          sed -i 's/requirements = python3,kivy/requirements = python3,kivy,routeros_api/g' buildozer.spec
+          sed -i 's/# android.permissions = INTERNET/android.permissions = INTERNET, BLUETOOTH, BLUETOOTH_ADMIN, BLUETOOTH_CONNECT, BLUETOOTH_SCAN/g' buildozer.spec
+          echo "y" | buildozer android debug
+      - name: Enviar APK Pronto para Tela
+        uses: actions/upload-artifact@v3
+        with:
+          name: YasminNET_Movel_APK
+          path: bin/*.apk
