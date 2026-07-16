@@ -4,10 +4,16 @@ jobs:
   android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Instalar Python e Ferramentas Moveis
         run: |
-          pip install buildozer cython==0.29.36
+          pip install --upgrade pip
+          pip install buildozer cython==0.29.36 kivy routeros_api
+          sudo apt-get update
           sudo apt-get install -y scons libportmidi-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav libmtdev-dev xclip xsel libjpeg-dev
       - name: Criar Configuracao e Compilar App
         run: |
@@ -17,7 +23,7 @@ jobs:
           sed -i 's/# android.permissions = INTERNET/android.permissions = INTERNET, BLUETOOTH, BLUETOOTH_ADMIN, BLUETOOTH_CONNECT, BLUETOOTH_SCAN/g' buildozer.spec
           echo "y" | buildozer android debug
       - name: Enviar APK Pronto para Tela
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: YasminNET_Movel_APK
           path: bin/*.apk
